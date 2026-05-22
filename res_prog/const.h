@@ -1,7 +1,10 @@
 #ifndef CONST_H_SENTRY
 #define CONST_H_SENTRY
 
-#define _(STR) (STR)    /*Macro for translatable strings*/
+#include <locale.h>
+#include <libintl.h>
+
+#define _(STR) gettext(STR)    /*Macro for translatable strings*/
 #define N_(STR) (STR)   /*Macro for non-translatable strings*/
 
 /*--== Constant array block ==--*/
