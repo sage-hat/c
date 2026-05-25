@@ -1,0 +1,121 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-22 22:48+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: decode.c:114
+#, c-format
+msgid "Resistor is: %g %cOhm, Tolerance %g%%\n"
+msgstr ""
+
+#: error.c:20
+#, c-format
+msgid "Error %d: Invalid number of arguments\n"
+msgstr ""
+
+#: error.c:23
+#, c-format
+msgid "Error %d: Invalid flag\n"
+msgstr ""
+
+#: error.c:26
+#, c-format
+msgid "Error %d: Memory allocation error\n"
+msgstr ""
+
+#: error.c:29
+#, c-format
+msgid ""
+"Error %d: Invalid color entered, use --help to get a list of available "
+"colors\n"
+msgstr ""
+
+#: error.c:32
+#, c-format
+msgid "Error %d: first argument cannot be \"black\"\n"
+msgstr ""
+
+#: error.c:35
+#, c-format
+msgid "Error %d: Nominal cannot be \"silver\"\n"
+msgstr ""
+
+#: error.c:38
+#, c-format
+msgid "Error %d: Nominal cannot be \"gold\"\n"
+msgstr ""
+
+#: error.c:41
+#, c-format
+msgid "Error %d: Tolerance cannot be \"black\"\n"
+msgstr ""
+
+#: error.c:44
+#, c-format
+msgid "Error %d: Tolerance cannot be \"orange\"\n"
+msgstr ""
+
+#: error.c:47
+#, c-format
+msgid "Error %d: Tolerance cannot be \"yellow\"\n"
+msgstr ""
+
+#: error.c:50
+#, c-format
+msgid "Error %d: Tolerance cannot be \"white\"\n"
+msgstr ""
+
+#: run.c:19
+#, c-format
+msgid "Usage: res [FLAG] <color1> <color2> <color3> <color4>\n"
+msgstr ""
+
+#: run.c:21
+#, c-format
+msgid "Decode 4-band resistor color codes.\n"
+msgstr ""
+
+#: run.c:23
+#, c-format
+msgid "Flags:\n"
+msgstr ""
+
+#: run.c:24
+#, c-format
+msgid ""
+"\t--decode <color1> <color2> <color3> <color4>   Decode colors (default)\n"
+msgstr ""
+
+#: run.c:25
+#, c-format
+msgid "\t--encode soon\n"
+msgstr ""
+
+#: run.c:26
+#, c-format
+msgid "\t--help                                          Show this help\n"
+msgstr ""
+
+#: run.c:28
+#, c-format
+msgid "Valid colors:\n"
+msgstr ""
+
+#: run.c:39
+#, c-format
+msgid "Nothing yet\n"
+msgstr ""
