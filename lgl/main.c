@@ -1,6 +1,6 @@
 #include <curses.h>
 #include <stdlib.h>
-#include <string.h>
+#include "my_string.h"
 #include "move.h"
 
 static const char message[] = "@";
@@ -49,7 +49,7 @@ static void normalize_input(char *input)
     in_spase = 0;
     temp = input_allocate();
     temp_count = 0;
-    for(i = 0; i < buffer_size; i++) {
+    for(i = 0; input[i] != '\0'; i++) {
         if(input[i] != ' ') {
             temp[temp_count] = input[i];
             in_spase = 0;
@@ -62,13 +62,13 @@ static void normalize_input(char *input)
         }
     }
 
-    if(temp[temp_count] == ' ') {
-        temp[temp_count] = '\0';
+    if((temp_count > 0) && (temp[temp_count - 1] == ' ')) {
+        temp[temp_count - 1] = '\0';
     }
     else
-        temp[temp_count + 1] = '\0';
+        temp[temp_count] = '\0';
     
-    strcpy(input, temp);
+    my_strcpy(input, temp);
     free(temp);
 }
 
