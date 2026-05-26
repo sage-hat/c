@@ -3,10 +3,17 @@
 #include "my_string.h"
 #include "move.h"
 
+#ifndef DEB
 static const char message[] = "@";
 enum {key_escape = 27};
 enum {key_command = '/'};
+#endif
 enum {buffer_size = 128};
+/*
+static const char *args[] = {
+    "echo"
+};
+*/
 
 static char *input_allocate()
 {
@@ -17,30 +24,19 @@ static char *input_allocate()
     return p;
 }
 
-static int read_chars(char *input)
+static int ticket_allocate(char **tickets, int *lens)
 {
-    int c;
-    int i = 0;
-    while((c = getch()) != '\n'){
-        if(i < buffer_size) {
-            input[i] = c;
-            i++;
-        }
-        else 
-            return -1;
+    int i;
+    char *temp;
+    for(i = 0; lens[i] != '\0'; i++) {
+        temp = malloc((lens[i] + 1)*(sizeof(char)));
+        tickets[i] = temp;
+        temp = NULL;
     }
-    input[i] = '\0';
+    tickets[i+1] = NULL;
     return 0;
 }
 
-static void clear_line(int y)
-{
-    int i;
-    for(i = 0; i < 50; i++) {
-        move(y, i);
-        addch(' ');
-    }
-}
 
 static void normalize_input(char *input)
 {
@@ -72,6 +68,63 @@ static void normalize_input(char *input)
     free(temp);
 }
 
+static int count_args(const char* input)
+{
+    int i,res;
+    res = 0;
+    for(i = 0; input[i] != '\0'; i++) {
+        if(input[i] == ' ') {
+            res++;
+        }
+    }
+    return ++res;
+}
+
+static void analyze_input(int *res, char *input, int args)
+{
+    int pos, i, cur_arg;
+    cur_arg = 0;
+    pos = 0;
+    for(i = 0; input[i] != '\0'; i++) {
+        if(input[i] != ' ') {
+            cur_arg++;
+        }
+        else {
+            res[pos] = cur_arg;
+            cur_arg = 0;
+            pos++;
+        }
+    }
+    res[pos] = cur_arg;
+    res[pos + 1] = '\0';
+}
+
+#ifndef DEB
+static int read_chars(char *input)
+{
+    int c;
+    int i = 0;
+    while((c = getch()) != '\n'){
+        if(i < buffer_size) {
+            input[i] = c;
+            i++;
+        }
+        else 
+            return -1;
+    }
+    input[i] = '\0';
+    return 0;
+}
+
+static void clear_line(int y)
+{
+    int i;
+    for(i = 0; i < 50; i++) {
+        move(y, i);
+        addch(' ');
+    }
+}
+
 static void command_process(int y)
 {
     int status, outp_y, inp_y;
@@ -101,9 +154,55 @@ static void command_process(int y)
     free(input);
     noecho();
 }
+#else
 
-int main()
+static int DEB_read_chars(char *input, char *arg)
 {
+    int i;
+    for(i = 0; arg[i] != '\0'; i++) {
+        if(i < buffer_size) {
+            input[i] = arg[i];
+        }
+        else 
+            return -1;
+    }
+    input[i] = '\0';
+    return 0;
+}
+
+static void DEB_command_process(char **argv)
+{
+    int status, args_count;
+    char *input;
+    int *analyze;
+    char **tickets;
+
+    input = input_allocate();
+    
+    status = DEB_read_chars(input, argv[1]);
+    if(status) {
+        exit(1);
+    }
+    normalize_input(input);
+    args_count = count_args(input);
+    
+    printf("%d\n", args_count);
+
+    analyze = malloc((args_count + 1)*sizeof(int));
+
+    analyze_input(analyze, input, args_count);
+
+    tickets = malloc((args_count + 1)*sizeof(char*));
+    ticket_allocate(tickets, analyze);
+
+    printf("%d\n", args_count);
+
+
+}
+#endif
+int main(int argc, char **argv)
+{
+#ifndef DEB
     int row, col, x, y, max_x, max_y, key;
     initscr();
     cbreak();
@@ -140,4 +239,7 @@ int main()
     }
     endwin();
     return 0;
+#else
+    DEB_command_process(argv);
+#endif
 }

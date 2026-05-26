@@ -39,5 +39,5 @@ void my_strcpy(char *dest, char *source)
     for(i = 0; source[i] != '\0'; i++) {
         dest[i] = source[i];
     }
-    dest[i+1] = '\0';
+    dest[i] = '\0';
 }
