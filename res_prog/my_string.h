@@ -11,4 +11,6 @@ int my_strlen(const char *str);
 
 int my_strcmp(const char *s1, const char *s2);
 
+void my_strcpy(char *dest, char *source);
+
 #endif
