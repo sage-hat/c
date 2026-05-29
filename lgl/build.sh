@@ -5,7 +5,7 @@ FileName=$1
 FileNameWithoutPrefix=${FileName/.c}
 
 
-#gcc -Wall -Wextra -Werror -g -c move.c -lcurses 
+gcc -Wall -Wextra -Werror -g -c move.c -lcurses 
 gcc -Wall -Wextra -Werror -g -c parse.c -lcurses 
 gcc -Wall -Wextra -Werror -g -c error.c -lcurses 
 

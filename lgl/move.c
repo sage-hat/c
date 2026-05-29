@@ -1,5 +1,6 @@
 #include "move.h"
 
+
 static const char message[] = "@";
 enum {key_escape = 27};
 
@@ -14,7 +15,7 @@ static void hide_message(int x, int y)
 {
     int i;
     move(y, x);
-    for(i = 0; i < sizeof(message) - 1; i++) {
+    for(i = 0; i < (int)sizeof(message) - 1; i++) {
         addch(' ');
     }
     refresh();
@@ -39,14 +40,14 @@ void move_message(int *x, int *y, int mx, int my, int dx, int dy)
     show_message(*x, *y);
 }
 
-void handle_resize(int *x, int * y, int *mx, int *my)
+void handle_resize(int *x, int * y, struct window_state *ws)
 {
     int row, col;
     getmaxyx(stdscr, row, col);
-    *mx = col - sizeof(message) + 1;
-    *my = row - 1;
+    ws->max_x = col - sizeof(message) + 1;
+    ws->max_y = row - 1;
     hide_message(*x, *y);
-    check(x, *mx);
-    check(y, *my);
+    check(x, ws->max_x);
+    check(y, ws->max_y);
     show_message(*x, *y);
 }

@@ -2,7 +2,7 @@
 * Module:     error.c
 * Author:     sage
 * Created:    28.05.2026
-* Modified:   28.05.2026
+* Modified:   29.05.2026
 * Version:    1.0
 * Description: Error handling module
 * 
@@ -23,12 +23,15 @@ void errprint(enum errors err_code, int output)
     switch(err_code) {
         case ERR_MEMORY:
             mvprintw(output, 0, _("error %d: %s"), err_code, ERR_MEMORY_MSG);
+            refresh();
             break;
         case ERR_BUFFER_OVERFLOW:
             mvprintw(output, 0, _("error %d: %s"), err_code, ERR_BUFFER_OVERFLOW_MSG);
+            refresh();
             break;
         case ERR_UNKNOWN_COMMAND:
             mvprintw(output, 0, _("error %d: %s"), err_code, ERR_UNKNOWN_COMMAND_MSG);
+            refresh();
             break;
     }
 }

@@ -1,8 +1,8 @@
 /*
 * Module:     decode.c
 * Author:     sage
-* Created:    22.05.2026
-* Modified:   22.05.2026
+* Created:    28.05.2026
+* Modified:   29.05.2026
 * Version:    1.0
 * Description: Parses input command line 
 * 
@@ -105,6 +105,9 @@ static int count_args(const char* input)
             res++;
         }
     }
+    if(i == 0 && res == 0) {
+        return res;
+    }
     return ++res;
 }
 
@@ -180,6 +183,7 @@ static void cmd_dispatcher(enum cmd_code flag, char **tickets, int output)
 
 #ifndef DEB
 static void handle_backspace(int y, int *i)
+/*Handles the case of backspace input*/
 {
     int pos;
     pos = *i;
@@ -205,11 +209,14 @@ static int read_chars(char *input, int y)
     int i = 0;
     while((c = getch()) != '\n'){
         if(i < buffer_size) {
+            if(i == 0 && c == key_command) {
+                /*Allows you to close a line with a slash character
+                 * if nothing is entered*/
+                return status_slash;
+            }
             if(c == KEY_BACKSPACE) {
                 handle_backspace(y, &i);
-           } else if(c == KEY_ENTER) {
-               return ERR_BUFFER_OVERFLOW
-           }
+           } 
             else {
                 input[i] = c;
                 i++;
@@ -222,48 +229,60 @@ static int read_chars(char *input, int y)
     return 0;
 }
 
-static void clear_line(int y)
+static void clear_line(int y, int x)
+/*Clears the line at the specified y*/
 {
     int i;
-    for(i = 0; i < 50; i++) {
+    for(i = 0; i <= x; i++) {
         move(y, i);
         addch(' ');
     }
+    refresh();
 }
 
-static int parse_cmd(struct cmd_state *cmd, struct y_pos *cmd_y)
+static int parse_cmd(struct cmd_state *cmd, const struct window_state *ws)
+/*String parsing process*/
 { 
     int status = 0;
     cmd->input = input_allocate(&status);
     if(status) {
-        errprint(status, cmd_y->output);
-        clear_line(cmd_y->input);
+        errprint(status, ws->cmd_output);
+        clear_line(ws->cmd_input, ws->max_x);
         return status;
     }
 
-    status = read_chars(cmd->input, cmd_y->input);
-    if(status) {
-        errprint(status, cmd_y->output);
-        clear_line(cmd_y->input);
+    status = read_chars(cmd->input, ws->cmd_input);
+    if(status < 0) {
+        free(cmd->input);
+        return -1;
+    }
+    if(status > 0) {
+        errprint(status, ws->cmd_output);
+        clear_line(ws->cmd_input, ws->max_x);
         free(cmd->input);
         return status;
     }
 
     status = normalize_input(cmd->input);
     if(status) {
-        errprint(status, cmd_y->output);
-        clear_line(cmd_y->input);
+        errprint(status, ws->cmd_output);
+        clear_line(ws->cmd_input, ws->max_x);
         free(cmd->input);
         return status;
 
     }
 
     cmd->args_count = count_args(cmd->input);
+    if(cmd->args_count == 0) {
+        /*If nothing is entered, pressing space closes the input*/
+        free(cmd->input);
+        return status_empty_str;
+    }
 
     cmd->lens = malloc((cmd->args_count + 1)*sizeof(int));
     if(cmd->lens == NULL) {
-        errprint(ERR_MEMORY, cmd_y->output);
-        clear_line(cmd_y->input);
+        errprint(ERR_MEMORY, ws->cmd_output);
+        clear_line(ws->cmd_input, ws->max_x);
         free(cmd->input);
         return ERR_MEMORY;
     }
@@ -272,8 +291,8 @@ static int parse_cmd(struct cmd_state *cmd, struct y_pos *cmd_y)
 
     cmd->tickets = malloc((cmd->args_count + 1)*sizeof(char*));
     if(cmd->tickets == NULL) {
-        errprint(ERR_MEMORY, cmd_y->output);
-        clear_line(cmd_y->input);
+        errprint(ERR_MEMORY, ws->cmd_output);
+        clear_line(ws->cmd_input, ws->max_x);
         free(cmd->lens);
         free(cmd->input);
         return ERR_MEMORY;
@@ -281,8 +300,8 @@ static int parse_cmd(struct cmd_state *cmd, struct y_pos *cmd_y)
 
     status = ticket_allocate(cmd->tickets, cmd->lens);
     if(status) {
-        errprint(status, cmd_y->output);
-        clear_line(cmd_y->input);
+        errprint(status, ws->cmd_output);
+        clear_line(ws->cmd_input, ws->max_x);
         free(cmd->tickets);
         free(cmd->lens);
         free(cmd->input);
@@ -296,48 +315,53 @@ static int parse_cmd(struct cmd_state *cmd, struct y_pos *cmd_y)
 
     status = check_cmd(cmd->tickets, &cmd->flag);
     if(status) {
-        errprint(status, cmd_y->output);
-        clear_line(cmd_y->input);
+        errprint(status, ws->cmd_output);
+        clear_line(ws->cmd_input, ws->max_x);
+        tickets_free(cmd->tickets);
         return status;
     }
     return status;
 }
-
+/*
 static void init_cmd_pos(int y, struct y_pos *cmd_y)
+Sets the values of y for command line input and output.
 {
-    cmd_y->input = y-1;
+    cmd_y->input = y;
     cmd_y->output = cmd_y->input - 1;
 
 }
-
+*/
 static void start_cmd(int y)
+/*Outputs the command line character*/
 {
     move(y, 0);
-    addch('/');
+    addch(key_command);
     move(y, 1);
     echo();
+    refresh();
 }
 
-int command_process(int y)
-/* =For debugging= Fills a string with characters*/
+int command_process(struct window_state *ws)
+/*Fills a string with characters*/
 {
-    struct y_pos cmd_y;
     int status = 0;
     struct cmd_state cmd;
-
-    init_cmd_pos(y, &cmd_y);
     
-    clear_line(cmd_y.output);
+    clear_line(ws->cmd_output, ws->max_x);
 
-    start_cmd(cmd_y.input);
+    start_cmd(ws->cmd_input);
     
-    status = parse_cmd(&cmd, &cmd_y);
-
-    cmd_dispatcher(cmd.flag, cmd.tickets, cmd_y.output);
+    status = parse_cmd(&cmd, ws);
+    if(status == 0) {
+        cmd_dispatcher(cmd.flag, cmd.tickets, ws->cmd_output);
+        tickets_free(cmd.tickets);
+    }
     
-    tickets_free(cmd.tickets);
 
-    clear_line(cmd_y.input);
+    clear_line(ws->cmd_input, ws->max_x);
+    noecho();
+    curs_set(0);
+    refresh();
 
     return status;
 }
