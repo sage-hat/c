@@ -2,7 +2,7 @@
 * Module:     error.c
 * Author:     sage
 * Created:    28.05.2026
-* Modified:   29.05.2026
+* Modified:   01.06.2026
 * Version:    1.0
 * Description: Error handling module
 * 
@@ -14,6 +14,8 @@
 static const char *ERR_MEMORY_MSG = {_("Memory allocation failed")};
 static const char *ERR_BUFFER_OVERFLOW_MSG = {_("Buffer overflow - input too long")};
 static const char *ERR_UNKNOWN_COMMAND_MSG = {_("Unknown command")};
+static const char *ERR_UNKNOWN_ARG_MSG = {_("Unknown argument")};
+static const char *ERR_WRONG_ARGS_COUNT_MSG = {_("Incorrect number of arguments entered")};
 
 
 #ifndef DEB
@@ -33,6 +35,15 @@ void errprint(enum errors err_code, int output)
             mvprintw(output, 0, _("error %d: %s"), err_code, ERR_UNKNOWN_COMMAND_MSG);
             refresh();
             break;
+        case ERR_UNKNOWN_ARG:
+            mvprintw(output, 0, _("error %d: %s"), err_code, ERR_UNKNOWN_ARG_MSG);
+            refresh();
+            break;
+        case ERR_WRONG_ARGS_COUNT:
+            mvprintw(output, 0, _("error %d: %s"), err_code, ERR_WRONG_ARGS_COUNT_MSG);
+            refresh();
+            break;
+
     }
 }
 #else

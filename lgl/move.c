@@ -21,33 +21,42 @@ static void hide_message(int x, int y)
     refresh();
 }
 
-static void check(int *coord, int max)
+static void check_x(int *coord, const struct window_state *ws)
 {
-    if(*coord < 0)
-        *coord = 0;
+    if(*coord < ws->left_max_x)
+        *coord = ws->left_max_x;
     else
-    if(*coord > max)
-        *coord = max;
+    if(*coord > ws->right_max_x)
+        *coord = ws->right_max_x;
 }
 
-void move_message(int *x, int *y, int mx, int my, int dx, int dy)
+static void check_y(int *coord, const struct window_state *ws)
+{
+    if(*coord < ws->top_max_y)
+        *coord = ws->top_max_y;
+    else
+    if(*coord > ws->bottom_max_y)
+        *coord = ws->bottom_max_y;
+}
+
+void move_message(int *x, int *y, const struct window_state *ws, int dx, int dy)
 {
     hide_message(*x, *y);
     *x += dx;
-    check(x, mx);
+    check_x(x, ws);
     *y += dy;
-    check(y, my);
+    check_y(y, ws);
     show_message(*x, *y);
 }
 
-void handle_resize(int *x, int * y, struct window_state *ws)
+void handle_resize(int *x, int *y, struct window_state *ws)
 {
     int row, col;
     getmaxyx(stdscr, row, col);
     ws->max_x = col - sizeof(message) + 1;
     ws->max_y = row - 1;
     hide_message(*x, *y);
-    check(x, ws->max_x);
-    check(y, ws->max_y);
+    check_x(x, ws);
+    check_y(y, ws);
     show_message(*x, *y);
 }

@@ -11,22 +11,17 @@
 #ifndef DEB
 #include <curses.h>
 #include "move.h"
+#include "cmd.h"
+#include "interface.h"
+#include "state.h"
 #endif
 
 enum {key_escape = 27};
 enum {key_command = '/'};
 enum {buffer_size = 128};
 enum {argv_number = 1};
-enum {cmd_num = 2};
-
-enum cmd_args {
-    cmd, arg_1, arg_2
-};
-
-enum cmd_code {
-    cmd_echo = 1,
-    cmd_test = 2,
-};
+enum {cmd_num = 5};
+enum {args_num = 3};
 
 enum stat_code {
     status_slash = -1,
@@ -36,6 +31,7 @@ enum stat_code {
 struct cmd_state {
     int  args_count;
     enum cmd_code flag;
+    enum cmd_args_name arg;
     char *input;
     int *lens;
     char **tickets;

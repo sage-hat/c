@@ -2,18 +2,28 @@
 * Module:     decode.c
 * Author:     sage
 * Created:    28.05.2026
-* Modified:   29.05.2026
+* Modified:   01.06.2026
 * Version:    1.0
 * Description: Parses input command line 
 * 
 * Comments:   
 */
+
 #include "parse.h"
 
-static const char *args[] = {
+static const char *commands[] = {
 /*List of valid commands*/
     "echo",
-    "test"
+    "print",
+    "clear",
+    "exit",
+    "refresh"
+};
+
+static const char *arguments[] = {
+    "std",
+    "uit",
+    "uib"
 };
 
 static char *input_allocate(int *status)
@@ -93,9 +103,7 @@ static int normalize_input(char *input)
     strcpy(input, temp);
     free(temp);
     return 0;
-}
-
-static int count_args(const char* input)
+} static int count_args(const char* input)
 /*Counts argsuments of the input string*/
 {
     int i,res;
@@ -156,7 +164,7 @@ static int check_cmd(char **tickets, enum cmd_code *flag)
 {
     int status, i;
     for(i = 0; i < cmd_num; i++) {
-        if(0 == strcmp(tickets[cmd], args[i])) {
+        if(0 == strcmp(tickets[cmd], commands[i])) {
             *flag = i + 1;
             status = 0;
             break;
@@ -168,17 +176,40 @@ static int check_cmd(char **tickets, enum cmd_code *flag)
     return status;
 }
 
-static void cmd_dispatcher(enum cmd_code flag, char **tickets, int output)
-/*The process of calling functions depending on the received command code*/
+static int check_arg(char **tickets, enum cmd_code flag, enum cmd_args_name *arg, int args_count)
 {
-    switch(flag) {
-        case cmd_echo:
-            mvprintw(output, 0, "%s", tickets[arg_1]);
-            break;
-        case cmd_test:
-            mvprintw(output, 0, "It's just a test command");
-            break;
+    int i, status, curent_arg;
+    if(args_count < 2) {
+        return ERR_WRONG_ARGS_COUNT;
     }
+    for(i = 0; i < args_num; i++) {
+        if(0 == strcmp(tickets[arg_1], arguments[i])){
+            curent_arg = i + 1;
+            status = 0;
+            break;
+        } else {
+            status = ERR_UNKNOWN_ARG;
+        }
+    }
+    if(status == 0) {
+        if(flag == cmd_print) {
+            if(args_count == 3) {
+                *arg = curent_arg;
+            } else {
+                status = ERR_WRONG_ARGS_COUNT;
+            }
+        } else if(flag == cmd_clear) {
+            if(args_count == 2) {
+                *arg = curent_arg;
+            } else {
+                status = ERR_WRONG_ARGS_COUNT;
+            }
+        } else {
+            status = ERR_WRONG_ARGS_COUNT;
+        }
+            
+    }
+    return status;
 }
 
 #ifndef DEB
@@ -227,17 +258,6 @@ static int read_chars(char *input, int y)
     }
     input[i] = '\0';
     return 0;
-}
-
-static void clear_line(int y, int x)
-/*Clears the line at the specified y*/
-{
-    int i;
-    for(i = 0; i <= x; i++) {
-        move(y, i);
-        addch(' ');
-    }
-    refresh();
 }
 
 static int parse_cmd(struct cmd_state *cmd, const struct window_state *ws)
@@ -320,17 +340,19 @@ static int parse_cmd(struct cmd_state *cmd, const struct window_state *ws)
         tickets_free(cmd->tickets);
         return status;
     }
+
+    status = check_arg(cmd->tickets, cmd->flag, &cmd->arg, cmd->args_count);
+    if(status) {
+        errprint(status, ws->cmd_output);
+        clear_line(ws->cmd_input, ws->max_x);
+        tickets_free(cmd->tickets);
+        return status;
+    }
+
+
     return status;
 }
-/*
-static void init_cmd_pos(int y, struct y_pos *cmd_y)
-Sets the values of y for command line input and output.
-{
-    cmd_y->input = y;
-    cmd_y->output = cmd_y->input - 1;
 
-}
-*/
 static void start_cmd(int y)
 /*Outputs the command line character*/
 {
@@ -353,7 +375,7 @@ int command_process(struct window_state *ws)
     
     status = parse_cmd(&cmd, ws);
     if(status == 0) {
-        cmd_dispatcher(cmd.flag, cmd.tickets, ws->cmd_output);
+        cmd_dispatcher(cmd.flag, cmd.tickets, ws);
         tickets_free(cmd.tickets);
     }
     
