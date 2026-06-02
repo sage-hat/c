@@ -106,7 +106,7 @@ static void draw_corners(int y, int x_1, int x_2)
  
 }
 
-void set_border(const struct window_state *ws)
+static void set_border(const struct window_state *ws)
 /*The process of drawing borders*/
 {
     render_border(ws->left_border_x, ws->right_border_x, ws->top_border, h_print);
@@ -129,28 +129,34 @@ static void clear_border(const struct window_state *ws)
     refresh();
 }
 
-void init_game(struct window_state *ws, int *x, int *y)
+void init_window(struct window_state *ws)
 /*Initializing the game state*/
 {
     int row, col;
     getmaxyx(stdscr, row, col);
+    /*
     *x = (col -(sizeof(message)-1)) / 2;
     *y = row/2;
+   show_message(*x, *y);
+    */
     ws->max_x = col - sizeof(message) + 1;
     ws->max_y = row - 1;
     set_win_coords(ws);
-    show_message(*x, *y);
 
     set_border(ws);
 
     refresh();
 }
 
-void execute_resize(struct window_state *ws, int *x, int *y)
+void execute_resize(struct window_state *ws)
 /*Handling a window change case*/
 {
     clear_border(ws);
-    handle_resize(x, y, ws);
+
+    int row, col;
+    getmaxyx(stdscr, row, col);
+    ws->max_x = col - sizeof(message) + 1;
+    ws->max_y = row - 1;
     set_win_coords(ws);
     set_border(ws);
 }

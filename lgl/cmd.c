@@ -73,14 +73,14 @@ static void execute_exit()
     exit(0);
 }
 
-static void execute_refresh(const struct window_state *ws)
+static void execute_refresh(struct window_state *ws)
 /*Execute command refresh*/
 {
     erase();
-    set_border(ws);
+    execute_resize(ws);
 }
 
-void cmd_dispatcher(enum cmd_code flag, enum cmd_args_name arg, char **tickets, const struct window_state *ws)
+void cmd_dispatcher(enum cmd_code flag, enum cmd_args_name arg, char **tickets, struct window_state *ws)
 /*The process of calling functions depending on the received command code*/
 {
     switch(flag) {
@@ -99,6 +99,5 @@ void cmd_dispatcher(enum cmd_code flag, enum cmd_args_name arg, char **tickets, 
         case cmd_refresh:
             execute_refresh(ws);
             break;
-
     }
 }

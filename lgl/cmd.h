@@ -7,7 +7,6 @@
 #include "state.h"
 #include "interface.h"
 
-
 extern const char *commands[];
 extern const char *arguments[];
 
@@ -29,7 +28,7 @@ enum cmd_args_name {
     arg_uib
 };
 
-
-void cmd_dispatcher(enum cmd_code flag, enum cmd_args_name arg, char **tickets, const struct window_state *ws);
+void cmd_dispatcher(enum cmd_code flag, enum cmd_args_name arg, char **tickets, struct window_state *ws);
 
 #endif
+

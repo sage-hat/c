@@ -29,12 +29,19 @@ struct window_state {
 };
 
 struct game_state {
+    int heihgt;
+    int width;
+    int offset_y;
+    int offset_x;
+    /*
     int max_y;
     int max_x;
     int min_y;
     int min_x;
+    */
     int py;
     int px;
 };
 
 #endif
+

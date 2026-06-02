@@ -10,7 +10,6 @@
 #define _(STR) (STR)    /*Macro for translatable strings*/
 #define N_(STR) (STR)   /*Macro for non-translatable strings*/
 
-
 enum errors {
     ERR_MEMORY = 1,
     ERR_BUFFER_OVERFLOW,
@@ -19,7 +18,6 @@ enum errors {
     ERR_WRONG_ARGS_COUNT
 };
 
-
 #ifndef DEB
 void errprint(enum errors err_code, int output);
 #else
@@ -27,5 +25,5 @@ void errprint(enum errors err_code, int output);
 void DEB_errprint(enum errors err_code);
 #endif
 
-
 #endif
+
