@@ -2,29 +2,14 @@
 * Module:     decode.c
 * Author:     sage
 * Created:    28.05.2026
-* Modified:   01.06.2026
-* Version:    1.0
+* Modified:   02.06.2026
+* Version:    0.1
 * Description: Parses input command line 
 * 
-* Comments:   
+* Comments: Debug mode is not relevant
 */
 
 #include "parse.h"
-
-static const char *commands[] = {
-/*List of valid commands*/
-    "echo",
-    "print",
-    "clear",
-    "exit",
-    "refresh"
-};
-
-static const char *arguments[] = {
-    "std",
-    "uit",
-    "uib"
-};
 
 static char *input_allocate(int *status)
 /*Allocates memory for the input string*/
@@ -103,7 +88,9 @@ static int normalize_input(char *input)
     strcpy(input, temp);
     free(temp);
     return 0;
-} static int count_args(const char* input)
+}
+
+static int count_args(const char* input)
 /*Counts argsuments of the input string*/
 {
     int i,res;
@@ -176,7 +163,54 @@ static int check_cmd(char **tickets, enum cmd_code *flag)
     return status;
 }
 
-static int check_arg(char **tickets, enum cmd_code flag, enum cmd_args_name *arg, int args_count)
+static int check_args_count(struct cmd_state *cmd)
+/*Checks the flag against the argument count condition*/
+{
+    int status = 0;
+    enum cmd_code flag_code;
+    flag_code = cmd->flag;
+    switch(flag_code) {
+        case cmd_echo:
+            if(cmd->args_count == args_two) {
+                status = 0;
+            } else {
+                status = ERR_WRONG_ARGS_COUNT;
+            }
+            break;
+        case cmd_print:
+            if(cmd->args_count == args_three) {
+                status = status_need_check_arg;
+            } else {
+                status = ERR_WRONG_ARGS_COUNT;
+            }
+            break;
+        case cmd_clear:
+            if(cmd->args_count == args_two) {
+                status = status_need_check_arg;
+            } else {
+                status = ERR_WRONG_ARGS_COUNT;
+            }
+            break;
+        case cmd_exit:
+            if(cmd->args_count == args_one) {
+                status = 0;
+            } else {
+                status = ERR_WRONG_ARGS_COUNT;
+            }
+            break;
+        case cmd_refresh:
+            if(cmd->args_count == args_one) {
+                status = 0;
+            } else {
+                status = ERR_WRONG_ARGS_COUNT;
+            }
+            break;
+    }
+    return status;
+}
+
+static int check_arg(char **tickets, enum cmd_args_name *arg, int args_count)
+/*Checks if the second ticket is a valid argumen*/
 {
     int i, status, curent_arg;
     if(args_count < 2) {
@@ -191,23 +225,28 @@ static int check_arg(char **tickets, enum cmd_code flag, enum cmd_args_name *arg
             status = ERR_UNKNOWN_ARG;
         }
     }
-    if(status == 0) {
-        if(flag == cmd_print) {
-            if(args_count == 3) {
-                *arg = curent_arg;
-            } else {
-                status = ERR_WRONG_ARGS_COUNT;
-            }
-        } else if(flag == cmd_clear) {
-            if(args_count == 2) {
-                *arg = curent_arg;
-            } else {
-                status = ERR_WRONG_ARGS_COUNT;
-            }
-        } else {
-            status = ERR_WRONG_ARGS_COUNT;
+    *arg = curent_arg;
+    
+    return status;
+}
+
+static int valid_args(struct cmd_state *cmd)
+/*Command line argument validation process*/
+{
+    int status = 0;
+    status = check_cmd(cmd->tickets, &cmd->flag);
+    if(status) {
+        return status;
+    }
+    status = check_args_count(cmd);
+    if(status > 0) {
+        return status;
+    }
+    if(status == status_need_check_arg) {
+        status = check_arg(cmd->tickets, &cmd->arg, cmd->args_count);
+        if(status) {
+            return status;
         }
-            
     }
     return status;
 }
@@ -233,6 +272,7 @@ static void handle_backspace(int y, int *i)
     }
 
 }
+
 static int read_chars(char *input, int y)
 /* Fills a string with characters*/
 {
@@ -274,7 +314,7 @@ static int parse_cmd(struct cmd_state *cmd, const struct window_state *ws)
     status = read_chars(cmd->input, ws->cmd_input);
     if(status < 0) {
         free(cmd->input);
-        return -1;
+        return status_slash;
     }
     if(status > 0) {
         errprint(status, ws->cmd_output);
@@ -333,22 +373,13 @@ static int parse_cmd(struct cmd_state *cmd, const struct window_state *ws)
     free(cmd->input);
     free(cmd->lens);
 
-    status = check_cmd(cmd->tickets, &cmd->flag);
+    status = valid_args(cmd);
     if(status) {
         errprint(status, ws->cmd_output);
         clear_line(ws->cmd_input, ws->max_x);
         tickets_free(cmd->tickets);
         return status;
     }
-
-    status = check_arg(cmd->tickets, cmd->flag, &cmd->arg, cmd->args_count);
-    if(status) {
-        errprint(status, ws->cmd_output);
-        clear_line(ws->cmd_input, ws->max_x);
-        tickets_free(cmd->tickets);
-        return status;
-    }
-
 
     return status;
 }
@@ -375,7 +406,7 @@ int command_process(struct window_state *ws)
     
     status = parse_cmd(&cmd, ws);
     if(status == 0) {
-        cmd_dispatcher(cmd.flag, cmd.tickets, ws);
+        cmd_dispatcher(cmd.flag, cmd.arg, cmd. tickets, ws);
         tickets_free(cmd.tickets);
     }
     

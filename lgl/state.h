@@ -28,4 +28,13 @@ struct window_state {
     int cmd_output;
 };
 
+struct game_state {
+    int max_y;
+    int max_x;
+    int min_y;
+    int min_x;
+    int py;
+    int px;
+};
+
 #endif

@@ -3,6 +3,7 @@
 
 #include <curses.h>
 #include "state.h"
+/*temp*/
 #include "move.h"
 
 
@@ -16,7 +17,5 @@ enum render_mode {
 void init_game(struct window_state *ws, int *x, int *y);
 void execute_resize(struct window_state *ws, int *x, int *y);
 void set_border(const struct window_state *ws);
-void clear_border(const struct window_state *ws);
-void set_win_coords(struct window_state *ws);
 void clear_line(int y, int x);
 #endif

@@ -2,8 +2,8 @@
 * Module:     error.c
 * Author:     sage
 * Created:    28.05.2026
-* Modified:   01.06.2026
-* Version:    1.0
+* Modified:   02.06.2026
+* Version:    0.1
 * Description: Error handling module
 * 
 * Comments:   
@@ -11,6 +11,7 @@
 #include "error.h"
 
 /*--==List of error messages==-- */
+static const char *ERR_START = {_("Error %d: %s")};
 static const char *ERR_MEMORY_MSG = {_("Memory allocation failed")};
 static const char *ERR_BUFFER_OVERFLOW_MSG = {_("Buffer overflow - input too long")};
 static const char *ERR_UNKNOWN_COMMAND_MSG = {_("Unknown command")};
@@ -24,23 +25,23 @@ void errprint(enum errors err_code, int output)
 {
     switch(err_code) {
         case ERR_MEMORY:
-            mvprintw(output, 0, _("error %d: %s"), err_code, ERR_MEMORY_MSG);
+            mvprintw(output, 0, ERR_START, err_code, ERR_MEMORY_MSG);
             refresh();
             break;
         case ERR_BUFFER_OVERFLOW:
-            mvprintw(output, 0, _("error %d: %s"), err_code, ERR_BUFFER_OVERFLOW_MSG);
+            mvprintw(output, 0, ERR_START, err_code, ERR_BUFFER_OVERFLOW_MSG);
             refresh();
             break;
         case ERR_UNKNOWN_COMMAND:
-            mvprintw(output, 0, _("error %d: %s"), err_code, ERR_UNKNOWN_COMMAND_MSG);
+            mvprintw(output, 0, ERR_START, err_code, ERR_UNKNOWN_COMMAND_MSG);
             refresh();
             break;
         case ERR_UNKNOWN_ARG:
-            mvprintw(output, 0, _("error %d: %s"), err_code, ERR_UNKNOWN_ARG_MSG);
+            mvprintw(output, 0, ERR_START, err_code, ERR_UNKNOWN_ARG_MSG);
             refresh();
             break;
         case ERR_WRONG_ARGS_COUNT:
-            mvprintw(output, 0, _("error %d: %s"), err_code, ERR_WRONG_ARGS_COUNT_MSG);
+            mvprintw(output, 0, ERR_START, err_code, ERR_WRONG_ARGS_COUNT_MSG);
             refresh();
             break;
 

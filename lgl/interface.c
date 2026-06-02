@@ -1,3 +1,14 @@
+/*
+* Module:     interface.c
+* Author:     sage
+* Created:    01.06.2026
+* Modified:   02.06.2026
+* Version:    0.1
+* Description: Interface control module
+* 
+* Comments: 
+*/
+
 #include "interface.h"
 
 static const char message[] = "@";
@@ -5,31 +16,6 @@ static const char h_char[] = "-";
 static const char v_char[] = "|";
 static const char corner_char[] = "O";
 static const char clear_char[] = " ";
-
-void init_game(struct window_state *ws, int *x, int *y)
-{
-    int row, col;
-    getmaxyx(stdscr, row, col);
-    *x = (col -(sizeof(message)-1)) / 2;
-    *y = row/2;
-    ws->max_x = col - sizeof(message) + 1;
-    ws->max_y = row - 1;
-    set_win_coords(ws);
-    show_message(*x, *y);
-
-    set_border(ws);
-
-    refresh();
-}
-
-void execute_resize(struct window_state *ws, int *x, int *y)
-{
-    clear_border(ws);
-    handle_resize(x, y, ws);
-    set_win_coords(ws);
-    set_border(ws);
-}
-
 
 void clear_line(int y, int x)
 /*Clears the line at the specified y*/
@@ -49,6 +35,7 @@ static void init_cmd_pos(struct window_state *ws)
 }
 
 static void init_top(struct window_state *ws)
+/*Sets the values of y for top side.*/
 {
     ws->ui_top = 0;
     ws->ui_bottom = ws->ui_top + 1;
@@ -57,6 +44,7 @@ static void init_top(struct window_state *ws)
 }
 
 static void init_bottom(struct window_state *ws)
+/*Sets the values of y for bottom side.*/
 {
     ws->std_output = ws->cmd_output - 1;
     ws->bottom_border = ws->std_output - 1;
@@ -64,6 +52,7 @@ static void init_bottom(struct window_state *ws)
 }
 
 static void init_borders(struct window_state *ws)
+/*Sets the values of x for borders.*/
 {
     ws->left_border_x = 1;
     ws->left_max_x = ws->left_border_x + 1;
@@ -71,8 +60,18 @@ static void init_borders(struct window_state *ws)
     ws->right_max_x = ws->right_border_x - 1;
 }
 
+static void set_win_coords(struct window_state *ws)
+/*The main function for initializing screen positions*/
+{
+    init_cmd_pos(ws);
+    init_top(ws);
+    init_bottom(ws);
+    init_borders(ws);
+}
+
 static void render_border
         (int start_pos, int finish_pos, int static_pos, enum render_mode mode)
+/*Prints and removes borders depending on the flag*/
 {
     int i;
     for(i = start_pos; i < finish_pos; i++) {
@@ -98,6 +97,7 @@ static void render_border
 }
 
 static void draw_corners(int y, int x_1, int x_2)
+/*Sets the characters at the corners of the border*/
 {
     move(y, x_1);
     addstr(corner_char);
@@ -107,6 +107,7 @@ static void draw_corners(int y, int x_1, int x_2)
 }
 
 void set_border(const struct window_state *ws)
+/*The process of drawing borders*/
 {
     render_border(ws->left_border_x, ws->right_border_x, ws->top_border, h_print);
     render_border(ws->left_border_x, ws->right_border_x, ws->bottom_border, h_print);
@@ -118,7 +119,8 @@ void set_border(const struct window_state *ws)
     refresh();
 }
 
-void clear_border(const struct window_state *ws)
+static void clear_border(const struct window_state *ws)
+/*The process of cleaning borders*/
 {
     render_border(ws->left_border_x, ws->right_border_x, ws->top_border, h_clear);
     render_border(ws->left_border_x, ws->right_border_x, ws->bottom_border, h_clear);
@@ -127,10 +129,29 @@ void clear_border(const struct window_state *ws)
     refresh();
 }
 
-void set_win_coords(struct window_state *ws)
+void init_game(struct window_state *ws, int *x, int *y)
+/*Initializing the game state*/
 {
-    init_cmd_pos(ws);
-    init_top(ws);
-    init_bottom(ws);
-    init_borders(ws);
+    int row, col;
+    getmaxyx(stdscr, row, col);
+    *x = (col -(sizeof(message)-1)) / 2;
+    *y = row/2;
+    ws->max_x = col - sizeof(message) + 1;
+    ws->max_y = row - 1;
+    set_win_coords(ws);
+    show_message(*x, *y);
+
+    set_border(ws);
+
+    refresh();
 }
+
+void execute_resize(struct window_state *ws, int *x, int *y)
+/*Handling a window change case*/
+{
+    clear_border(ws);
+    handle_resize(x, y, ws);
+    set_win_coords(ws);
+    set_border(ws);
+}
+

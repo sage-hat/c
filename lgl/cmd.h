@@ -1,9 +1,16 @@
 #ifndef CMD_H_SENTRY
 #define CMD_H_SENTRY
 
+#include <string.h>
+#include <stdlib.h>
 #include <curses.h>
 #include "state.h"
 #include "interface.h"
+
+
+extern const char *commands[];
+extern const char *arguments[];
+
 enum cmd_args {
     cmd, arg_1, arg_2
 };
@@ -22,5 +29,7 @@ enum cmd_args_name {
     arg_uib
 };
 
-void cmd_dispatcher(enum cmd_code flag, char **tickets, const struct window_state *ws);
+
+void cmd_dispatcher(enum cmd_code flag, enum cmd_args_name arg, char **tickets, const struct window_state *ws);
+
 #endif

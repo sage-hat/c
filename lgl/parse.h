@@ -4,13 +4,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-
-
 #include "error.h"
 
 #ifndef DEB
 #include <curses.h>
-#include "move.h"
 #include "cmd.h"
 #include "interface.h"
 #include "state.h"
@@ -25,7 +22,14 @@ enum {args_num = 3};
 
 enum stat_code {
     status_slash = -1,
-    status_empty_str = -2
+    status_empty_str = -2,
+    status_need_check_arg = -3
+};
+
+enum {
+    args_one = 1,
+    args_two,
+    args_three
 };
 
 struct cmd_state {
@@ -38,18 +42,13 @@ struct cmd_state {
 };
 
 #ifndef DEB
-struct y_pos {
-    int input;
-    int output;
-};
 
 int command_process(struct window_state *ws);
-#endif
 
+#else
 
-
-#ifdef DEB
 int DEB_command_process(char **argv);
+
 #endif
 
 #endif
