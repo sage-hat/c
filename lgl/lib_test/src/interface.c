@@ -17,7 +17,7 @@ static const char v_char[] = "|";
 static const char corner_char[] = "O";
 static const char clear_char[] = " ";
 
-void clear_line(int y, int x)
+void lgl_clear_line(int y, int x)
 /*Clears the line at the specified y*/
 {
     int i;
@@ -144,7 +144,7 @@ void init_window(struct window_state *ws)
     refresh();
 }
 
-void execute_resize(struct window_state *ws)
+void lgl_execute_resize(struct window_state *ws)
 /*Handling a window change case*/
 {
     clear_border(ws);

@@ -1,6 +1,7 @@
 #include <curses.h>
 #include <time.h>
 #include "game.h"
+#include "lgl.h"
 
 #define _(STR) (STR)    /*Macro for translatable strings*/
 #define N_(STR) (STR)   /*Macro for non-translatable strings*/

@@ -2,11 +2,8 @@
 #define GAME_H_SENTRY
 
 #include <stdlib.h>
-#include "error.h"
-#include "state.h"
-#include "parse.h"
-#include "cmd.h"
-
+#include <curses.h>
+#include "lgl.h"
 
 enum cell_code {
     cell_empty = 1,
