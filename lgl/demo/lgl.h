@@ -3,7 +3,7 @@
 
 typedef struct window_state window_state_t;
 
-window_state_t* lgl_init(void);
+window_state_t* lgl_init();
 void lgl_cleanup(window_state_t *ws);
 
 
@@ -23,12 +23,12 @@ void lgl_execute_resize(struct window_state *ws);
 void lgl_clear_line(int y, int x);
 
 
-int lgl_get_std_output(struct window_state *ws);
-int lgl_get_ui_top(struct window_state *ws);
-int lgl_get_ui_bottom(struct window_state *ws);
-int lgl_get_play_field_top(struct window_state *ws);
-int lgl_get_play_field_bottom(struct window_state *ws);
-int lgl_get_play_field_left(struct window_state *ws);
-int lgl_get_play_field_right(struct window_state *ws);
+int lgl_get_std_output(window_state_t *ws);
+int lgl_get_ui_top(window_state_t *ws);
+int lgl_get_ui_bottom(window_state_t *ws);
+int lgl_get_play_field_top(window_state_t *ws);
+int lgl_get_play_field_bottom(window_state_t *ws);
+int lgl_get_play_field_left(window_state_t *ws);
+int lgl_get_play_field_right(window_state_t *ws);
 
 #endif

@@ -1,7 +1,6 @@
 #ifndef STATE_H_SENTRY
 #define STATE_H_SENTRY
 
-enum {max_coins = 15};
 
 struct window_state {
     /*Screen size*/
@@ -30,22 +29,6 @@ struct window_state {
     int cmd_output;
 };
 
-
-struct game_state {
-    int height;
-    int width;
-    int offset_y;
-    int offset_x;
-    int py;
-    int px;
-    int score;
-    int level;
-    int score_goal;
-    int is_lvlup;
-    int resize_pendind;
-    int y_coins[max_coins];
-    int x_coins[max_coins];
-};
 
 #endif
 

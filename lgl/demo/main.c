@@ -8,20 +8,21 @@
 
 static void main_process()
 {
-    struct window_state ws;
-    init_window(&ws);
-    game_process(&ws);
-    endwin();
+    window_state_t *ws;
+    ws = lgl_init();
+    game_process(ws);
+    lgl_cleanup(ws);
 }
 
 int main()
 {
+    /*
     initscr();
     cbreak();
     keypad(stdscr, 1);
     noecho();
     curs_set(0);
-
+*/
     srand(time(NULL));
 
     main_process();

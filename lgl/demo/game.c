@@ -121,14 +121,25 @@ static void init_playeryx(struct game_state *gs, char **gf)
     gf[gs->py][gs->px] = cell_player;
 }
 
-static void init_gs(struct game_state *gs, const struct window_state *ws)
+static void init_gs(struct game_state *gs, window_state_t *ws)
 /*Initializes the game state*/
 {
-    gs->height = ws->bottom_max_y - ws->top_max_y + 1;
-    gs->width = ws->right_max_x - ws->left_max_x + 1;
+    int top_max_y, bottom_max_y, right_max_x, left_max_x, ui_top, ui_bottom;
+    top_max_y = lgl_get_play_field_top(ws);
+    bottom_max_y = lgl_get_play_field_bottom(ws);
+    right_max_x = lgl_get_play_field_right(ws);
+    left_max_x = lgl_get_play_field_left(ws);
+    ui_top = lgl_get_ui_top(ws);
+    ui_bottom = lgl_get_ui_bottom(ws);
 
-    gs->offset_y = ws->top_max_y;
-    gs->offset_x = ws->left_max_x;
+    gs->height = bottom_max_y - top_max_y + 1;
+    gs->width = right_max_x - left_max_x + 1;
+
+    gs->offset_y = top_max_y;
+    gs->offset_x = left_max_x;
+
+    gs->uit_y = ui_top;
+    gs->uib_y = ui_bottom;
 
     gs->py = 0;
     gs->px = 0;
@@ -139,14 +150,26 @@ static void init_gs(struct game_state *gs, const struct window_state *ws)
     gs->resize_pendind = 0;
 }
 
-static void reload_gs(struct game_state *gs, const struct window_state *ws)
+static void reload_gs(struct game_state *gs, window_state_t *ws)
 /*Resets the game state*/
 {
-    gs->height = ws->bottom_max_y - ws->top_max_y + 1;
-    gs->width = ws->right_max_x - ws->left_max_x + 1;
 
-    gs->offset_y = ws->top_max_y;
-    gs->offset_x = ws->left_max_x;
+    int top_max_y, bottom_max_y, right_max_x, left_max_x, ui_top, ui_bottom;
+    top_max_y = lgl_get_play_field_top(ws);
+    bottom_max_y = lgl_get_play_field_bottom(ws);
+    right_max_x = lgl_get_play_field_right(ws);
+    left_max_x = lgl_get_play_field_left(ws);
+    ui_top = lgl_get_ui_top(ws);
+    ui_bottom = lgl_get_ui_bottom(ws);
+
+    gs->height = bottom_max_y - top_max_y + 1;
+    gs->width = right_max_x - left_max_x + 1;
+
+    gs->offset_y = top_max_y;
+    gs->offset_x = left_max_x;
+
+    gs->uit_y = ui_top;
+    gs->uib_y = ui_bottom;
 
     gs->py = 0;
     gs->px = 0;
@@ -268,7 +291,7 @@ static void render_vertical(char **gf, const struct game_state *gs, int cx)
     }
 }
 
-static void resize_gf(char ***gf, struct game_state *gs, struct window_state *ws)
+static void resize_gf(char ***gf, struct game_state *gs, window_state_t *ws)
 /*Resets the state of the playing field*/
 {
     int status;
@@ -291,7 +314,7 @@ static void resize_gf(char ***gf, struct game_state *gs, struct window_state *ws
     render_gf(*gf, gs);
 }
 
-static void handle_key(char ***gf, struct game_state *gs, struct window_state *ws)
+static void handle_key(char ***gf, struct game_state *gs, window_state_t *ws)
 /*Processing keystrokes*/
 {
     int key;
@@ -316,13 +339,13 @@ static void handle_key(char ***gf, struct game_state *gs, struct window_state *w
     case KEY_RESIZE:
              gs->resize_pendind = 1;
             break;
-    case key_command:
-            command_process(ws);
+    case lgl_key_command:
+            lgl_command_process(ws);
             break;
     }
 }
 
-void game_process(struct window_state *ws)
+void game_process(window_state_t *ws)
 /*The main process of the game*/
 {
     int status = 0;
@@ -347,12 +370,12 @@ void game_process(struct window_state *ws)
     for(;;) {
         check_coin(&gf, &gs);
         check_level(&gs);
-        mvprintw(ws->ui_top, 0, "Score: %d", gs.score);
-        mvprintw(ws->ui_bottom, 0, "Level: %d", gs.level);
+        mvprintw(gs.uit_y, 0, "Score: %d", gs.score);
+        mvprintw(gs.uib_y, 0, "Level: %d", gs.level);
         handle_key(&gf, &gs, ws);
 
         if(gs.resize_pendind && gs.is_lvlup) {
-            execute_resize(ws);
+            lgl_execute_resize(ws);
             gs.resize_pendind = 0;
             resize_gf(&gf, &gs, ws);
             gs.is_lvlup = 0;
